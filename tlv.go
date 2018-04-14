@@ -38,6 +38,10 @@ func (conn *TlvConn) NewConn(tcp_conn net.Conn) {
 	conn.conn = tcp_conn
 }
 
+func (conn *TlvConn) ReaderConn() net.Conn {
+	return conn.conn
+}
 
-
-
+func (conn *TlvConn) CloseConn() {
+	conn.conn.Close()
+}

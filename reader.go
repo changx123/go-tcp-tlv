@@ -3,7 +3,6 @@ package go_tcp_tlv
 import (
 	"bytes"
 	"encoding/binary"
-	"io"
 )
 
 //读取数据
@@ -17,6 +16,8 @@ func (conn *TlvConn) Reader() <-chan Tlv {
 		//接收数据缓冲区长度
 		biol := uint32(0)
 		var t Tlv
+		//EOF标识
+		var EOF = false
 		for {
 			//判断字节是否大于5(T.L 协调头5字节)
 			if t.Length == 0 && biol >= 5 {
@@ -36,18 +37,19 @@ func (conn *TlvConn) Reader() <-chan Tlv {
 				t.Value = tmpBt
 				//传输数据到通道
 				out <- t
-				//初始结构清空上次数据
-				t = Tlv{}
 				//减去(V)的长度
 				biol -= t.Length
+				//初始结构清空上次数据
+				t = Tlv{}
 				continue
+			}
+			if t.Length <= 0 && biol <= 0 && EOF {
+				break
 			}
 			//接收数据
 			l, err := conn.conn.Read(b)
 			if err != nil || l < 1 {
-				if err == io.EOF {
-					break
-				}
+				EOF = true
 				continue
 			}
 			//取到的数据写入缓冲区
