@@ -91,7 +91,11 @@ LISTEN:
 			fmt.Println(ERR_NOT_ACTION)
 			continue
 		}
-		go pFun(route)
+		//路由结构
+		var route_p Route
+		route_p.Conn = route.Conn
+		route_p.Module = route.Module
+		go pFun(&route_p)
 	}
 }
 
