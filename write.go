@@ -3,6 +3,7 @@ package go_tcp_tlv
 import (
 	"encoding/binary"
 	"bytes"
+	"fmt"
 )
 
 func (conn *TlvConn) Write(b []byte) (uint32, error) {
@@ -10,6 +11,11 @@ func (conn *TlvConn) Write(b []byte) (uint32, error) {
 }
 
 func (conn *TlvConn) connWrite(b []byte, t uint8) (uint32, error) {
+	defer func() {
+		if err:=recover();err!=nil{
+			fmt.Println(err)
+		}
+	}()
 	//tlv 数据结构
 	var tlv Tlv
 	tlv.Type = uint8(t)

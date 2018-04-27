@@ -96,11 +96,11 @@ LISTEN:
 }
 
 func (route *Route) Write(module uint16, action uint16, b []byte) (uint32, error) {
-	b = route.writeModule(module, action, b)
+	b = route.WriteModule(module, action, b)
 	return route.Conn.Write(b)
 }
 
-func (route *Route) writeModule(module uint16, action uint16, b []byte) []byte {
+func (route *Route) WriteModule(module uint16, action uint16, b []byte) []byte {
 	bytesBuffer := bytes.NewBuffer([]byte{})
 	binary.Write(bytesBuffer, route.Conn.Endian, module)
 	binary.Write(bytesBuffer, route.Conn.Endian, action)
