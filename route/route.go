@@ -68,8 +68,12 @@ func (route *Route) Listen() {
 LISTEN:
 	for v := range listen {
 		route.analysisMA(v)
+		//路由结构
+		var route_p Route
+		route_p.Conn = route.Conn
+		route_p.Module = route.Module
 		for _, vFun := range route.routeFun.useFun {
-			err := vFun(route)
+			err := vFun(&route_p)
 			if err != nil {
 				if err == USE_FUN_SKIP {
 					continue LISTEN
@@ -91,10 +95,6 @@ LISTEN:
 			fmt.Println(ERR_NOT_ACTION)
 			continue
 		}
-		//路由结构
-		var route_p Route
-		route_p.Conn = route.Conn
-		route_p.Module = route.Module
 		go pFun(&route_p)
 	}
 }

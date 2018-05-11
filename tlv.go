@@ -43,5 +43,7 @@ func (conn *TlvConn) ReaderConn() net.Conn {
 }
 
 func (conn *TlvConn) CloseConn() {
+	ConnCloseChan[conn] = make(chan string, 1)
+	ConnCloseChan[conn] <- "close"
 	conn.conn.Close()
 }

@@ -3,7 +3,10 @@ package go_tcp_tlv
 import (
 	"bytes"
 	"encoding/binary"
+	"io"
 )
+
+var ConnCloseChan = make(map[*TlvConn]chan string)
 
 //读取数据
 func (conn *TlvConn) Reader() <-chan Tlv {
@@ -48,8 +51,18 @@ func (conn *TlvConn) Reader() <-chan Tlv {
 			}
 			//接收数据
 			l, err := conn.conn.Read(b)
-			if err != nil || l < 1 {
-				EOF = true
+			if err != nil {
+				if err == io.EOF && l <= 0 {
+					EOF = true
+				}
+				connchan, ok := ConnCloseChan[conn]
+				if ok {
+					m := <-connchan
+					if m == "close" {
+						delete(ConnCloseChan, conn)
+						break
+					}
+				}
 				continue
 			}
 			//取到的数据写入缓冲区
